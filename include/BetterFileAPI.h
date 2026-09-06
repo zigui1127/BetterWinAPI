@@ -53,6 +53,33 @@ namespace BetterWinAPI
 		FileCreationDisposition dw_creation_disposition_;
 		FileFlagsAndAttributes dw_flags_and_attributes_;
 		bool access_failed_;
+
+		HFile(HANDLE handle,
+			const std::string &lp_filename = std::string(),
+			const FileDesiredAccess dw_desired_access = FileDesiredAccess::read_write,
+			const FileShareMode dw_share_mode = FileShareMode::exclusive,
+			const FileCreationDisposition dw_creation_disposition = FileCreationDisposition::create_new,
+			const FileFlagsAndAttributes dw_flags_and_attributes = FileFlagsAndAttributes::normal_file)
+			: handle_file_(handle),
+			  lp_filename_(std::string(lp_filename)),
+			  dw_desired_access_(dw_desired_access),
+			  dw_share_mode_(dw_share_mode),
+			  dw_creation_disposition_(dw_creation_disposition),
+			  dw_flags_and_attributes_(dw_flags_and_attributes)
+		{
+			this->access_failed_ = false;
+			SetLastError(ERROR_SUCCESS);
+			this->handle_file_ = CreateFileA(
+				this->lp_filename_.c_str(),
+				static_cast<DWORD>(this->dw_desired_access_),
+				static_cast<DWORD>(this->dw_share_mode_),
+				NULL,
+				static_cast<DWORD>(this->dw_creation_disposition_),
+				static_cast<DWORD>(this->dw_flags_and_attributes_),
+				NULL
+			);
+			this->access_failed_ = (this->handle_file_ == INVALID_HANDLE_VALUE);
+		}
 	public:
 		HFile() = delete;
 
@@ -222,6 +249,48 @@ namespace BetterWinAPI
 				return -1;
 			}
 			return temp_num_of_bytes_write;
+		}
+
+		HFile copy(HANDLE source_process_handle = INVALID_HANDLE_VALUE, HANDLE target_process_handle = INVALID_HANDLE_VALUE)
+		{
+			this->access_failed_ = false;
+			SetLastError(ERROR_SUCCESS);
+
+			this->access_failed_ = (this->handle_file_ == INVALID_HANDLE_VALUE);
+			if (this->access_failed_)
+			{
+				SetLastError(ERROR_INVALID_HANDLE);
+				return {INVALID_HANDLE_VALUE};
+			}
+
+			source_process_handle =
+				(source_process_handle == INVALID_HANDLE_VALUE? GetCurrentProcess() :
+					source_process_handle);
+			target_process_handle =
+				(target_process_handle == INVALID_HANDLE_VALUE? GetCurrentProcess() :
+					target_process_handle);
+
+			HANDLE temp_handle = INVALID_HANDLE_VALUE;
+			if (!DuplicateHandle(
+				source_process_handle,
+				this->handle_file_,
+				target_process_handle,
+				&temp_handle,
+				0,
+				FALSE,
+				DUPLICATE_SAME_ACCESS
+			))
+			{
+				this->access_failed_ = true;
+				return {INVALID_HANDLE_VALUE};
+			}
+
+			return {temp_handle,
+				this->lp_filename_,
+				this->dw_desired_access_,
+				this->dw_share_mode_,
+				this->dw_creation_disposition_,
+				this->dw_flags_and_attributes_};
 		}
 
 		[[nodiscard]] bool accessFailed() const noexcept
