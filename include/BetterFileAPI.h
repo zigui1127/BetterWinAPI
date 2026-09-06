@@ -65,20 +65,9 @@ namespace BetterWinAPI
 			  dw_desired_access_(dw_desired_access),
 			  dw_share_mode_(dw_share_mode),
 			  dw_creation_disposition_(dw_creation_disposition),
-			  dw_flags_and_attributes_(dw_flags_and_attributes)
+			  dw_flags_and_attributes_(dw_flags_and_attributes),
+			  access_failed_(false)
 		{
-			this->access_failed_ = false;
-			SetLastError(ERROR_SUCCESS);
-			this->handle_file_ = CreateFileA(
-				this->lp_filename_.c_str(),
-				static_cast<DWORD>(this->dw_desired_access_),
-				static_cast<DWORD>(this->dw_share_mode_),
-				NULL,
-				static_cast<DWORD>(this->dw_creation_disposition_),
-				static_cast<DWORD>(this->dw_flags_and_attributes_),
-				NULL
-			);
-			this->access_failed_ = (this->handle_file_ == INVALID_HANDLE_VALUE);
 		}
 	public:
 		HFile() = delete;
