@@ -15,7 +15,15 @@ namespace BetterWinAPI
 		error_sharing_violation = ERROR_SHARING_VIOLATION,
 		error_service_not_active = ERROR_SERVICE_NOT_ACTIVE,
 		error_file_exists = ERROR_FILE_EXISTS,
-		error_invalid_handle = ERROR_INVALID_HANDLE
+		error_invalid_handle = ERROR_INVALID_HANDLE,
+		error_handle_eof = ERROR_HANDLE_EOF,
+		error_too_many_open_files = ERROR_TOO_MANY_OPEN_FILES,
+		error_write_protect = ERROR_WRITE_PROTECT,
+		error_write_fault = ERROR_WRITE_FAULT,
+		error_read_fault = ERROR_READ_FAULT,
+		error_handle_disk_full = ERROR_HANDLE_DISK_FULL,
+		error_lock_violation = ERROR_LOCK_VIOLATION,
+		error_sharing_buffer_exceeded = ERROR_SHARING_BUFFER_EXCEEDED,
 		// TODO: 找更多的Error code, 回头一起添在这玩意里面(我太懒了, 懒得一次性全写好放里面)
 	};
 
@@ -151,7 +159,15 @@ namespace BetterWinAPI
 		{ErrorValue_::error_access_denied, "系统说你没实力就别瞎掺和, 搁这看你没权限访问的文件"},
 		{ErrorValue_::error_sharing_violation, "你先让其他进程别他妈搁这占用这个文件再说吧"},
 		{ErrorValue_::error_service_not_active, "你先等等再开始, 我还没准备好呢"},
-		{ErrorValue_::error_invalid_handle, "这个句柄神秘消失了, 快找回来吧"}
+		{ErrorValue_::error_invalid_handle, "这个句柄神秘消失了, 快找回来吧"},
+		{ErrorValue_::error_handle_eof, "啊哦, 已经到文件末尾了, 设置一下句柄重头开始读吧"},
+		{ErrorValue_::error_too_many_open_files, "你打开的文件有那么亿点点多啊, 关掉点再来吧"},
+		{ErrorValue_::error_write_protect, "主人说了这里不准你写东西喵~(细节猫娘语doge)"},
+		{ErrorValue_::error_write_fault, "又是写数据的一天啊... 等一下, 为什么我数据写不进去了?!(恼"},
+		{ErrorValue_::error_read_fault, "元气满满的一天从读取数据开始... 不是哥们，我硬盘怎么坏了?!!!!!!!"},
+		{ErrorValue_::error_handle_disk_full, "你硬盘满了塞不下东西了, 赶紧删掉一些\"学习资料\"吧(doge)"},
+		{ErrorValue_::error_lock_violation, "阿巴阿巴你文件怎么被锁了? 反正我不知道"},
+		{ErrorValue_::error_sharing_buffer_exceeded, "不是哥们, 你他妈的是不是把硬盘里所有文件都开共享模式了啊?!"}
 	};
 
 	inline ErrorType getLastError() noexcept
